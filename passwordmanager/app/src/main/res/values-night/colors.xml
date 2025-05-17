@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="search_icon">#FFFFFFFF</color>
+    <color name="selected_background_folder_name">#44475a</color>
+    <color name="selected_background_folder_passwords">#3c3f51</color>
+</resources>

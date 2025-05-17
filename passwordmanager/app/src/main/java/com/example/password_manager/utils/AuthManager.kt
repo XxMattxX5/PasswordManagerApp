@@ -1,0 +1,112 @@
+package com.example.password_manager.utils
+
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.example.password_manager.ui.HomeActivity
+import androidx.core.content.edit
+import kotlinx.coroutines.Dispatchers
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import com.example.password_manager.BuildConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+
+
+
+object AuthManager {
+
+    private const val PREFS_NAME = "secure_prefs"
+    private const val KEY_TOKEN = "ACCESS_TOKEN"
+
+    var isLogged: Boolean? = null
+
+    @Volatile
+    private var validationJob: Deferred<Boolean>? = null
+
+    fun saveToken(context: Context, token: String) {
+        getPrefs(context).edit() { putString(KEY_TOKEN, token) }
+    }
+
+    fun getToken(context: Context): String? {
+        return getPrefs(context).getString(KEY_TOKEN, null)
+    }
+
+    fun isLoggedIn(context: Context): Boolean {
+        return getToken(context) != null
+    }
+
+    fun logout(context: Context) {
+        getPrefs(context).edit() { remove(KEY_TOKEN) }
+        EncryptionManager.deleteStoredKey(context)
+        isLogged = false
+
+        val intent = Intent(context, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        context.startActivity(intent)
+
+        if (context is Activity) {
+            context.finish()
+        }
+    }
+
+    private fun getPrefs(context: Context): SharedPreferences {
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        return EncryptedSharedPreferences.create(
+            context,
+            PREFS_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+    suspend fun validateToken(context: Context): Boolean {
+
+
+        validationJob?.let {
+            return it.await()
+        }
+
+        // Otherwise, create a new job for validation
+        val newJob = CoroutineScope(Dispatchers.IO).async {
+            val url = BuildConfig.BASE_URL
+            val token = getToken(context) ?: return@async false
+
+            val client = OkHttpClient()
+            val request = Request.Builder()
+                .url("$url/auth/validate/")
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            return@async try {
+                val response = client.newCall(request).execute()
+                isLogged = response.isSuccessful
+                response.isSuccessful
+            } catch (e: Exception) {
+                e.printStackTrace()
+                isLogged = false
+                false
+            }
+        }
+
+        validationJob = newJob
+
+        try {
+            return newJob.await()
+        } finally {
+            // Clear the job after completion so future calls can trigger a new validation
+            validationJob = null
+        }
+    }
+
+
+
+
+}

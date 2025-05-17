@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">password-manager</string>
+    <string name="app_title">Password Manager</string>
+    <string name="app_logo">Password Manager logo</string>
+    <string name="app_message">Securely store and manage all your passwords in one place. Access them anytime with ease, knowing they\'re protected by strong encryption.</string>
+    <string name="sign_in_title">Sign In</string>
+    <string name="icon_password">Password icon</string>
+    <string name="title_password">Password</string>
+    <string name="title_username">Username</string>
+    <string name="icon_username">user icon</string>
+    <string name="button_sign_in">Sign In</string>
+    <string name="button_sign_up">Sign Up</string>
+    <string name="button_logout">Logout</string>
+    <string name="search_passwords">Search for passwords…</string>
+    <string name="icon_add_folder">Add folder icon</string>
+    <string name="icon_add">Add icon</string>
+    <string name="title_register">Register</string>
+    <string name="register_title_username">Username</string>
+    <string name="register_title_email">Email</string>
+    <string name="register_title_password">Enter password</string>
+    <string name="register_title_confirm_password">Confirm Password</string>
+    <string name="hint_register_username">Enter username</string>
+    <string name="hint_register_email">Enter email address</string>
+    <string name="hint_register_password">Enter password</string>
+    <string name="hint_register_confirm_password">Confirm password</string>
+    <string name="button_create_account">Create Account</string>
+    <string name="icon_mail">mail icon</string>
+    <string name="title_create_folder">Create Folder</string>
+    <string name="input_header_create_folder">Folder Name</string>
+    <string name="button_create_folder">Create Folder</string>
+    <string name="hint_folder_name">Enter folder name</string>
+    <string name="title_create_password">Create Password</string>
+    <string name="input_header_account_name">Account Name</string>
+    <string name="hint_account_name">Enter account name</string>
+    <string name="input_header_username">Username</string>
+    <string name="hint_username">Enter username</string>
+    <string name="input_header_password">Password</string>
+    <string name="hint_password">Enter password</string>
+    <string name="button_save_password">Save Password</string>
+    <string name="button_update_password">Update Password</string>
+    <string name="button_delete_password">Delete Password</string>
+    <string name="button_update_folder">Update Folder</string>
+    <string name="button_delete_folder">Delete Folder</string>
+
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="green">#3DDC84</color>
+    <color name="darkGreen">#2E7D57</color>
+    <color name="darkGreen2">#256D4A</color>
+    <color name="hintColor">#80000000</color>
+    <color name="inputText">#000000</color>
+    <color name="selected_background_folder_name">#CCCCCC</color>
+    <color name="selected_background_folder_passwords">#F0F0F0</color>
+    <color name="search_icon">#FF000000</color>
+    <color name="delete">#D32F2F</color>
+</resources>

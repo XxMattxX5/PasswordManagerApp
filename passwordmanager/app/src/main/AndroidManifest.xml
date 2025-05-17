@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application
+        android:name=".ui.MyApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Passwordmanager"
+        tools:targetApi="31"
+        android:usesCleartextTraffic="true"
+
+        >
+        <activity android:name=".ui.HomeActivity" />
+        <activity android:name=".ui.LoginActivity" />
+        <activity android:name=".ui.PasswordListActivity"/>
+        <activity android:name=".ui.RegisterActivity"/>
+        <activity android:name=".ui.CreateFolderActivity"/>
+        <activity android:name=".ui.CreatePasswordActivity"/>
+        <activity android:name=".ui.PasswordActivity"/>
+        <activity android:name=".ui.FolderActivity"/>
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

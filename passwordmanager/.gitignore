@@ -1,0 +1,61 @@
+# *.iml
+# .gradle
+# /local.properties
+# /.idea/caches
+# /.idea/libraries
+# /.idea/modules.xml
+# /.idea/workspace.xml
+# /.idea/navEditor.xml
+# /.idea/assetWizardSettings.xml
+# .DS_Store
+# /build
+# /captures
+# .externalNativeBuild
+# .cxx
+# local.properties
+# Gradle files
+
+# Gradle files
+.gradle/
+build/
+*/build/
+
+# Local configuration file (SDK path, etc.)
+local.properties
+
+# IDE settings
+.idea/
+*.iml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Keystore files (important!)
+*.jks
+*.keystore
+
+# Crashlytics / Firebase
+fabric.properties
+crashlytics-build.properties
+
+# Generated files
+captures/
+output.json
+navigation.json
+
+# Android Studio Navigation Editor temp files
+.navigation/
+
+# Kotlin specific
+*.class
+*.jar
+*.war
+*.ear
+
+# Misc
+.gradle/
+caches/
