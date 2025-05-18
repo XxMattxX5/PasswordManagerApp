@@ -102,6 +102,7 @@
                 android:inputType="textPassword"
                 android:textColorHint="@color/hintColor"
                 android:textColor="@color/inputText"
+                android:hapticFeedbackEnabled="false"
                 />
 
             <ProgressBar

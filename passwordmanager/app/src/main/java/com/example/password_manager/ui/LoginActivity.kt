@@ -66,7 +66,7 @@ class LoginActivity: BaseActivity() {
                                 R.drawable.visibility_off_eye, 0)
                         }
                         editTextPassword.setSelection(editTextPassword.text.length)
-                        editTextPassword.performClick()
+//                        editTextPassword.performClick()
                         return@setOnTouchListener true
                     }
                 }

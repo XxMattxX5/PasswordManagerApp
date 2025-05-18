@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.password_manager.BuildConfig
@@ -96,7 +97,7 @@ class PasswordActivity: BaseActivity() {
                                 R.drawable.visibility_off_eye, 0)
                         }
                         passwordInput.setSelection(passwordInput.text.length)
-                        passwordInput.performClick()
+//                        passwordInput.performClick()
                         return@setOnTouchListener true
                     }
                 }
@@ -134,6 +135,9 @@ class PasswordActivity: BaseActivity() {
     private fun fetchPasswordFromBackend(id: String) {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
+
+        val loadingProgress = findViewById<ProgressBar>(R.id.progressBar2)
+        val passwordContent = findViewById<ScrollView>(R.id.scrollView1)
 
         val accountNameInput = findViewById<EditText>(R.id.editTextText3)
         val usernameInput = findViewById<EditText>(R.id.editTextText4)
@@ -187,6 +191,10 @@ class PasswordActivity: BaseActivity() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+            withContext(Dispatchers.Main) {
+                loadingProgress.visibility = View.GONE
+                passwordContent.visibility = View.VISIBLE
             }
         }
     }

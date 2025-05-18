@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Response
 
 class CreatePasswordActivity: BaseActivity() {
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,13 +83,15 @@ class CreatePasswordActivity: BaseActivity() {
                                 R.drawable.visibility_off_eye, 0)
                         }
                         editTextPassword.setSelection(editTextPassword.text.length)
-                        editTextPassword.performClick()
+//                        editTextPassword.performClick()
                         return@setOnTouchListener true
                     }
                 }
             }
             false
         }
+
+
 
     }
 

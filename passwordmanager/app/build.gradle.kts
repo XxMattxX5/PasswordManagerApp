@@ -7,6 +7,14 @@ android {
     namespace = "com.example.password_manager"
     compileSdk = 35
 
+    applicationVariants.configureEach {
+        outputs.configureEach {
+            val appName = "passwordmanager"
+            val buildType = buildType.name
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+                "$appName.apk"
+        }
+    }
 
     defaultConfig {
         applicationId = "com.example.password_manager"

@@ -25,7 +25,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import android.text.TextWatcher
 import android.content.Intent
+import android.view.View.GONE
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.ScrollView
 import androidx.lifecycle.lifecycleScope
 
 class PasswordListActivity : BaseActivity() {
@@ -71,8 +74,7 @@ class PasswordListActivity : BaseActivity() {
             emptyList(),
             emptyList(),
             onPasswordClick = { password ->
-                selectedFolderId = null
-                selectedFolderName = null
+                
             },
             onFolderClick = { folder ->
                 if (selectedFolderId == folder.id) {
@@ -137,7 +139,6 @@ class PasswordListActivity : BaseActivity() {
     private fun fetchPasswordsFromBackend(query: String = "") {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
-
 
         // Append "q" query parameter if query is not empty
         val url = if (query.isNotEmpty()) {

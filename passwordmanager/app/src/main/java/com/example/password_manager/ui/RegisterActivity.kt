@@ -78,7 +78,7 @@ class RegisterActivity: BaseActivity() {
                                 R.drawable.visibility_off_eye, 0)
                         }
                         editTextPassword.setSelection(editTextPassword.text.length)
-                        editTextPassword.performClick()
+//                        editTextPassword.performClick()
 
                         return@setOnTouchListener true
                     }
@@ -110,7 +110,7 @@ class RegisterActivity: BaseActivity() {
                                 R.drawable.visibility_off_eye, 0)
                         }
                         editTextPassword2.setSelection(editTextPassword2.text.length)
-                        editTextPassword2.performClick()
+//                        editTextPassword2.performClick()
 
                         return@setOnTouchListener true
                     }

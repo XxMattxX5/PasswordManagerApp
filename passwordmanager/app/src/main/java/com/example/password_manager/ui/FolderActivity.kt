@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.password_manager.BuildConfig
@@ -90,6 +92,9 @@ class FolderActivity:BaseActivity() {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
 
+        val loadingProgress = findViewById<ProgressBar>(R.id.progressBar2)
+        val folderContent = findViewById<LinearLayout>(R.id.layout2)
+
         val folderNameInput = findViewById<EditText>(R.id.editTextText2)
 
         val client = OkHttpClient()
@@ -125,6 +130,10 @@ class FolderActivity:BaseActivity() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+            withContext(Dispatchers.Main) {
+                loadingProgress.visibility = View.GONE
+                folderContent.visibility = View.VISIBLE
             }
         }
     }

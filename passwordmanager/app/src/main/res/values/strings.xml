@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">password-manager</string>
+    <string name="app_name">Password Manager</string>
     <string name="app_title">Password Manager</string>
     <string name="app_logo">Password Manager logo</string>
     <string name="app_message">Securely store and manage all your passwords in one place. Access them anytime with ease, knowing they\'re protected by strong encryption.</string>
