@@ -46,6 +46,7 @@ class PasswordListActivity : BaseActivity() {
         createPasswordButton.setOnClickListener {
             val intent = Intent(this@PasswordListActivity, CreatePasswordActivity::class.java)
 
+            // Adds folder id and name to intent if not null
             selectedFolderId?.let { folderId ->
                 intent.putExtra("SELECTED_FOLDER_ID", folderId)
             }
@@ -91,6 +92,7 @@ class PasswordListActivity : BaseActivity() {
 
         fetchPasswordsFromBackend()
 
+        // On search change request is send to backend for passwords list
         val searchEditText = findViewById<EditText>(R.id.searchEditText)
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -107,6 +109,8 @@ class PasswordListActivity : BaseActivity() {
         })
     }
 
+    // On resume user's auth is checked
+    // If user is no longer logged in they are navigated hom
     override fun onResume() {
         super.onResume()
 
@@ -122,12 +126,14 @@ class PasswordListActivity : BaseActivity() {
         }
     }
 
+    // Navigates user to home page
     private fun navigateToHome() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    // Sends request to backend to fetch a list of passwords and folders associated with user
     private fun fetchPasswordsFromBackend(query: String = "") {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
@@ -149,6 +155,8 @@ class PasswordListActivity : BaseActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = client.newCall(request).execute()
+
+                // if success password list is populated using password adapter
                 if (response.isSuccessful) {
                     val body = response.body?.string()
                     if (body != null) {
@@ -161,6 +169,7 @@ class PasswordListActivity : BaseActivity() {
                     }
                 } else {
                     if (response.code == 401) {
+                        // If response is 401 user is logged out and navigated home
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@PasswordListActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                             AuthManager.logout(this@PasswordListActivity)
@@ -168,11 +177,6 @@ class PasswordListActivity : BaseActivity() {
                     }
 
                     Log.e("PasswordListActivity", "Error response: ${response.code}")
-
-//                    AuthManager.logout(this@PasswordListActivity)
-//                    val intent = Intent(this@PasswordListActivity, HomeActivity::class.java)
-//                    startActivity(intent)
-//                    finish()
 
                 }
             } catch (e: Exception) {
@@ -182,6 +186,7 @@ class PasswordListActivity : BaseActivity() {
     }
 
 
+    // Parses the response for the fetch password request
     private fun parseResponse(jsonString: String): Pair<List<PasswordFolder>, List<PasswordSummary>> {
         val folders = mutableListOf<PasswordFolder>()
         val standalonePasswords = mutableListOf<PasswordSummary>()

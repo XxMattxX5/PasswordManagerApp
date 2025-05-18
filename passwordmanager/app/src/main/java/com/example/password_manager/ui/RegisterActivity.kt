@@ -56,6 +56,7 @@ class RegisterActivity: BaseActivity() {
         val editTextPassword = findViewById<EditText>(R.id.editTextTextPassword)
         val editTextPassword2 = findViewById<EditText>(R.id.editTextTextPassword1)
 
+        // Changes the visibility of the password field and its associated visibility icon on touch
         editTextPassword.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = 2
@@ -87,6 +88,7 @@ class RegisterActivity: BaseActivity() {
             false
         }
 
+        // Changes the visibility of the confirm password field and its associated visibility icon on touch
         editTextPassword2.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = 2
@@ -121,6 +123,8 @@ class RegisterActivity: BaseActivity() {
 
     }
 
+    // On resume user's auth status is checked
+    // If user is no longer logged in they are navigated hom
     override fun onResume() {
         super.onResume()
 
@@ -136,18 +140,19 @@ class RegisterActivity: BaseActivity() {
         }
     }
 
+    // Navigates user to home page
     private fun navigateToPasswordList() {
         val intent = Intent(this, PasswordListActivity::class.java)
         startActivity(intent)
         finish()
     }
 
-
-
-    fun registerUser(username: String, email: String, password: String, passwordConfirm: String) {
+    // Sends a request to backend API to create new user
+    private fun registerUser(username: String, email: String, password: String, passwordConfirm: String) {
         val createAccountButton = findViewById<Button>(R.id.button3)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
+        // Sets page into processing state
         createAccountButton.isEnabled = false
         progressBar.visibility = View.VISIBLE
 
@@ -177,7 +182,6 @@ class RegisterActivity: BaseActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
                     // Show success message to user
                     Handler(Looper.getMainLooper()).post {
                         progressBar.visibility = View.GONE
@@ -191,6 +195,7 @@ class RegisterActivity: BaseActivity() {
                     finish()
 
                 } else {
+                    // Gets errors from response body and displays them to user
                     val errorBody = response.body?.string()
                     val errorJson = JSONObject(errorBody ?: "{}")
 
@@ -216,7 +221,7 @@ class RegisterActivity: BaseActivity() {
                         errors.add("Password Confirm: $msg")
                     }
 
-                    // Show validation errors to the user in a Toast (or any UI element you want)
+                    // Show validation errors to the user in a Toast
                     Handler(Looper.getMainLooper()).post {
                         progressBar.visibility = View.GONE
                         createAccountButton.isEnabled = true

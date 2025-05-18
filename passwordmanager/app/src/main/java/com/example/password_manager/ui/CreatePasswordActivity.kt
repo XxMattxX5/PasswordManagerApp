@@ -48,7 +48,6 @@ class CreatePasswordActivity: BaseActivity() {
         }
 
         val btnCreate = findViewById<Button>(R.id.button5)
-
         val passwordVisible = booleanArrayOf(false)
 
         btnCreate.setOnClickListener {
@@ -57,11 +56,11 @@ class CreatePasswordActivity: BaseActivity() {
             val password = findViewById<EditText>(R.id.editTextTextPassword2).text.toString()
 
             sendCreatePasswordRequest(accountName,username,password,folderId)
-
         }
 
         val editTextPassword = findViewById<EditText>(R.id.editTextTextPassword2)
 
+        // Changes visibility of password field and visibility icon on touch
         editTextPassword.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = 2
@@ -93,6 +92,7 @@ class CreatePasswordActivity: BaseActivity() {
 
     }
 
+    // Checks auth on resume and navigates user home on auth change
     override fun onResume() {
         super.onResume()
 
@@ -108,12 +108,14 @@ class CreatePasswordActivity: BaseActivity() {
         }
     }
 
+    // Navigates to the home page
     private fun navigateToHome() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    // Sends a request to backend API to create a new password associated with the user
     private fun sendCreatePasswordRequest(
         accountName: String,
         username: String,
@@ -123,6 +125,7 @@ class CreatePasswordActivity: BaseActivity() {
         val btnCreate = findViewById<Button>(R.id.button5)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
+        // Sets page into a processing state
         btnCreate.isEnabled = false
         progressBar.visibility = View.VISIBLE
 
@@ -132,6 +135,8 @@ class CreatePasswordActivity: BaseActivity() {
 
         val encryptionKey = EncryptionManager.retrieveDerivedKey(this)
 
+        // Pulls encryption key from storage and encrypts password before sending it
+        // If user doesn't have an encryption key stored they are logged out and navigated hom
         val encryptedPassword: String = if (encryptionKey != null) {
             EncryptionManager.encryptPassword(password, encryptionKey)
         } else {
@@ -167,12 +172,16 @@ class CreatePasswordActivity: BaseActivity() {
                 }
             }
 
+            // Handles the response returned from the create password request
             override fun onResponse(call: Call, response: Response) {
+
+                // Takes the page out of processing state
                 runOnUiThread {
                     btnCreate.isEnabled = true
                     progressBar.visibility = View.GONE
                 }
 
+                // If successful the user is giving a success message then navigated back to passwordlist page
                 if (response.isSuccessful) {
                     runOnUiThread {
                         Toast.makeText(this@CreatePasswordActivity, "Password created successfully!", Toast.LENGTH_SHORT).show()
@@ -180,9 +189,10 @@ class CreatePasswordActivity: BaseActivity() {
                         val intent = Intent(this@CreatePasswordActivity, PasswordListActivity::class.java)
                         startActivity(intent)
 
-                        finish()  // Close the activity or navigate away
+                        finish()
                     }
                 } else if (response.code == 401) {
+                    // Logs user out and navigates home if code is 401
                     runOnUiThread {
                         Toast.makeText(this@CreatePasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                         AuthManager.logout(this@CreatePasswordActivity)

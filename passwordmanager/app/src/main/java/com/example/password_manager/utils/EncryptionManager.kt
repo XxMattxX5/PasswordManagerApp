@@ -29,18 +29,22 @@ object EncryptionManager {
     private const val PREFS_NAME = "secure_prefs"
 
 
+    // Creates a encryption key given master password and encryption salt
     fun deriveKey(password: String, salt: ByteArray, iterations: Int = 100_000, keyLength: Int = 256): SecretKey {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
         val spec: KeySpec = PBEKeySpec(password.toCharArray(), salt, iterations, keyLength)
         val tmp = factory.generateSecret(spec)
         return SecretKeySpec(tmp.encoded, "AES")
     }
+
+    // Stores encryption key in android secure storage
     fun storeDerivedKey(context: Context, key: SecretKey) {
         val prefs = getPrefs(context) // your EncryptedSharedPreferences
         val encodedKey = Base64.encodeToString(key.encoded, Base64.DEFAULT)
         prefs.edit() { putString("derived_key", encodedKey) }
     }
 
+    // Retrieves encryption key from storage
     fun retrieveDerivedKey(context: Context): SecretKey? {
         val prefs = getPrefs(context)
         val encodedKey = prefs.getString("derived_key", null) ?: return null
@@ -84,6 +88,7 @@ object EncryptionManager {
         return String(decryptedBytes, Charsets.UTF_8)
     }
 
+    // Creates entry in android secure storage
     private fun getPrefs(context: Context): SharedPreferences {
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -98,6 +103,7 @@ object EncryptionManager {
         )
     }
 
+    // Deletes stored encryption key
     fun deleteStoredKey(context: Context) {
         val prefs = getPrefs(context)
         prefs.edit() { remove("derived_key") }

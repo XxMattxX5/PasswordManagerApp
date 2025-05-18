@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-
+        // Checks user auth to determine where to send them to upon enter app
         lifecycleScope.launch {
             if (AuthManager.isLogged == null) {
                 val valid = AuthManager.validateToken(this@MainActivity)

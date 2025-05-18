@@ -20,6 +20,7 @@ class MyApp : Application() {
         AndroidThreeTen.init(this)
     }
 
+    // Starts periodically check auth every 5 minutes
     private fun startPeriodicAuthCheck() {
         if (authCheckJob?.isActive == true) return
 

@@ -41,15 +41,16 @@ class PasswordActivity: BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_password)
 
+        // Gets password id from the intent and stores it
         passwordId = intent.getStringExtra("PASSWORD_ID") ?: throw IllegalArgumentException("PASSWORD_ID is missing")
 
+        // Grabs info on password from the backend
         fetchPasswordFromBackend(passwordId)
 
         val updatePasswordBtn = findViewById<Button>(R.id.button5)
         val deletePasswordBtn = findViewById<Button>(R.id.button6)
 
         updatePasswordBtn.setOnClickListener {
-
             val accountName = findViewById<EditText>(R.id.editTextText3).text.toString()
             val username = findViewById<EditText>(R.id.editTextText4).text.toString()
             val password = findViewById<EditText>(R.id.editTextTextPassword2).text.toString()
@@ -58,6 +59,7 @@ class PasswordActivity: BaseActivity() {
 
         }
 
+        // Gives user a confirm prompt before deletion
         deletePasswordBtn.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Confirm Delete")
@@ -70,9 +72,9 @@ class PasswordActivity: BaseActivity() {
         }
 
         val passwordInput = findViewById<EditText>(R.id.editTextTextPassword2)
-
         val passwordVisible = booleanArrayOf(false)
 
+        // Changes the visibility of the password field and changes the visibility icon
         passwordInput.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = 2
@@ -104,6 +106,8 @@ class PasswordActivity: BaseActivity() {
 
     }
 
+    // On resume the user's auth status is checked
+    // If the user is no longer logged in the user is navigated home
     override fun onResume() {
         super.onResume()
 
@@ -119,12 +123,14 @@ class PasswordActivity: BaseActivity() {
         }
     }
 
+    // Navigates the user home
     private fun navigateToHome() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    // Fetches password data from the backend api given the password id
     private fun fetchPasswordFromBackend(id: String) {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
@@ -132,6 +138,7 @@ class PasswordActivity: BaseActivity() {
         val accountNameInput = findViewById<EditText>(R.id.editTextText3)
         val usernameInput = findViewById<EditText>(R.id.editTextText4)
         val passwordInput = findViewById<EditText>(R.id.editTextTextPassword2)
+
 
         val client = OkHttpClient()
         val request = Request.Builder()
@@ -149,7 +156,8 @@ class PasswordActivity: BaseActivity() {
 
                         val encryptionKey = EncryptionManager.retrieveDerivedKey(this@PasswordActivity)
 
-
+                        // If Decryption key is found the incoming password is decrypted
+                        // If Decryption key is not found the user is logged out and navigated home
                         if (encryptionKey != null) {
                             password = EncryptionManager.decryptPassword(password, encryptionKey)
                         } else {
@@ -166,6 +174,7 @@ class PasswordActivity: BaseActivity() {
                     }
                 } else {
                     if (response.code == 401) {
+                        // If response returns 401 user is logged out and navigated hom
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@PasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                             AuthManager.logout(this@PasswordActivity)
@@ -182,7 +191,8 @@ class PasswordActivity: BaseActivity() {
         }
     }
 
-    fun parseResponse(body: String): Triple<String, String, String> {
+    // Parse the body of the fetch password request and return three strings
+    private fun parseResponse(body: String): Triple<String, String, String> {
         val json = JSONObject(body)
         val data = json.getJSONObject("data")
 
@@ -194,6 +204,7 @@ class PasswordActivity: BaseActivity() {
     }
 
 
+    // Sends a request to the backend to update the password associated with the given id
     private fun sendUpdatePasswordRequest(
         id:String,
         accountName: String,
@@ -203,8 +214,11 @@ class PasswordActivity: BaseActivity() {
     ) {
         val btnCreate = findViewById<Button>(R.id.button5)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        val deleteBtn = findViewById<Button>(R.id.button6)
 
+        // Sets page into processing state
         btnCreate.isEnabled = false
+        deleteBtn.isEnabled = false
         progressBar.visibility = View.VISIBLE
 
         val baseUrl = BuildConfig.BASE_URL
@@ -213,6 +227,8 @@ class PasswordActivity: BaseActivity() {
 
         val encryptionKey = EncryptionManager.retrieveDerivedKey(this)
 
+        // If encryption key is found password is encrypted before sending
+        // If encryption key is not found user is logged out and navigated home
         val encryptedPassword: String = if (encryptionKey != null) {
             EncryptionManager.encryptPassword(password, encryptionKey)
         } else {
@@ -240,6 +256,7 @@ class PasswordActivity: BaseActivity() {
                 runOnUiThread {
                     Toast.makeText(this@PasswordActivity, "Failed To Update: ${e.message}", Toast.LENGTH_SHORT).show()
                     btnCreate.isEnabled = true
+                    deleteBtn.isEnabled = true
                     progressBar.visibility = View.GONE
                 }
             }
@@ -247,9 +264,11 @@ class PasswordActivity: BaseActivity() {
             override fun onResponse(call: Call, response: Response) {
                 runOnUiThread {
                     btnCreate.isEnabled = true
+                    deleteBtn.isEnabled = true
                     progressBar.visibility = View.GONE
                 }
 
+                // If update is successful user is sent back to password list page
                 if (response.isSuccessful) {
                     runOnUiThread {
                         Toast.makeText(this@PasswordActivity, "Password updated successfully!", Toast.LENGTH_SHORT).show()
@@ -260,6 +279,7 @@ class PasswordActivity: BaseActivity() {
                         finish()
                     }
                 } else if (response.code == 401) {
+                    // If the response is 401 user is logged out and navigated home
                     runOnUiThread {
                         Toast.makeText(this@PasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                         AuthManager.logout(this@PasswordActivity)
@@ -274,9 +294,19 @@ class PasswordActivity: BaseActivity() {
         })
     }
 
+    // Sends request to backend to delete password associated with given id
     private fun deletePassword(id: String) {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
+
+        val btnCreate = findViewById<Button>(R.id.button5)
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        val deleteBtn = findViewById<Button>(R.id.button6)
+
+        // Sets page into processing state
+        btnCreate.isEnabled = false
+        deleteBtn.isEnabled = false
+        progressBar.visibility = View.VISIBLE
 
 
         val client = OkHttpClient()
@@ -287,8 +317,15 @@ class PasswordActivity: BaseActivity() {
             .build()
 
         CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main) {
+                btnCreate.isEnabled = true
+                deleteBtn.isEnabled = true
+                progressBar.visibility = View.GONE
+            }
             try {
                 val response = client.newCall(request).execute()
+
+                // If successful user is navigated to password list page
                 if (response.isSuccessful) {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@PasswordActivity, "Password Deleted", Toast.LENGTH_SHORT).show()
@@ -297,10 +334,9 @@ class PasswordActivity: BaseActivity() {
 
                             finish()
                         }
-
-
                 } else {
                     if (response.code == 401) {
+                        // if response is 401 user is logged out and navigated hom
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@PasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                             AuthManager.logout(this@PasswordActivity)

@@ -29,6 +29,8 @@ class HomeActivity: BaseActivity() {
 
     }
 
+    // On Resume user's auth is checked
+    // If user is logged in they are sent to passwordList page
     override fun onResume() {
         super.onResume()
 
@@ -44,6 +46,7 @@ class HomeActivity: BaseActivity() {
         }
     }
 
+    // Navigates user to the passwordList page
     private fun navigateToPasswordList() {
         val intent = Intent(this, PasswordListActivity::class.java)
         startActivity(intent)

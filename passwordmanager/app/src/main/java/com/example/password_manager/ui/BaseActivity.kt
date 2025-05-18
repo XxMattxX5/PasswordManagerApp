@@ -30,18 +30,16 @@ abstract class BaseActivity : AppCompatActivity() {
             setLogoutVisibility()
         }
     }
-
+    // Ensures login status is stored in the isLogged variable before updating top bar
     private suspend fun setLogoutVisibility() {
         if (AuthManager.isLogged == null) {
             AuthManager.validateToken(this@BaseActivity)
-            updateTopBarVisibility()
 
-        } else {
-            updateTopBarVisibility()
         }
+        updateTopBarVisibility()
     }
 
-
+    // Updates top bar visibility based on user's login status
     private fun updateTopBarVisibility() {
         val isLoggedIn = isUserLoggedIn()
         val logoutButton = findViewById<Button>(R.id.logoutButton)
@@ -54,7 +52,8 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun isUserLoggedIn(): Boolean {
+    // Gets user login status
+    private fun isUserLoggedIn(): Boolean {
         // Return cached value if available, else false
         return AuthManager.isLogged ?: false
     }

@@ -15,7 +15,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "BASE_URL", "\"http://192.168.1.232:8081\"")
+        buildConfigField("String", "BASE_URL", "\"https://passwordmanager.matthew-hicks-projects.org\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

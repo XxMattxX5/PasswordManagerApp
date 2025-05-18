@@ -35,6 +35,7 @@ class FolderActivity:BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_folder)
 
+        // Gets folder id from the intent
         folderId = intent.getStringExtra("FOLDER_ID") ?: throw IllegalArgumentException("FOLDER_ID is missing")
 
         fetchFolderFromBackend(folderId)
@@ -61,6 +62,7 @@ class FolderActivity:BaseActivity() {
 
     }
 
+    // Checks user auth status on resume and logouts as well as navigates them home
     override fun onResume() {
         super.onResume()
 
@@ -76,12 +78,14 @@ class FolderActivity:BaseActivity() {
         }
     }
 
+    // Navigates the user to the home page
     private fun navigateToHome() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    // Sends Request to the backend fetch folder using id
     private fun fetchFolderFromBackend(id: String) {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
@@ -109,14 +113,14 @@ class FolderActivity:BaseActivity() {
                     }
                 } else {
                     if (response.code == 401) {
+                        // Logs out user and navigates home if code is 401
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@FolderActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                             AuthManager.logout(this@FolderActivity)
+                            Toast.makeText(this@FolderActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     Log.e("PasswordActivity", "Error response: ${response.code}")
-
 
                 }
             } catch (e: Exception) {
@@ -125,21 +129,26 @@ class FolderActivity:BaseActivity() {
         }
     }
 
-    fun parseResponse(body: String): String {
+    // Parse response of fetch folder request
+    private fun parseResponse(body: String): String {
         val json = JSONObject(body)
         val data = json.getJSONObject("data")
 
         return data.getString("name")
     }
 
+    // Sends a request to backend to update the folder of the given id
     private fun sendUpdateFolderRequest(
         id:String,
         name: String,
         ) {
-        val btnCreate = findViewById<Button>(R.id.button5)
+        val btnCreate = findViewById<Button>(R.id.button4)
+        val deleteButton = findViewById<Button>(R.id.button5)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
+        // Sets page into a processing state
         btnCreate.isEnabled = false
+        deleteButton.isEnabled = false
         progressBar.visibility = View.VISIBLE
 
         val baseUrl = BuildConfig.BASE_URL
@@ -161,13 +170,18 @@ class FolderActivity:BaseActivity() {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
                     Toast.makeText(this@FolderActivity, "Failed To Update: ${e.message}", Toast.LENGTH_SHORT).show()
+                    deleteButton.isEnabled = true
                     btnCreate.isEnabled = true
                     progressBar.visibility = View.GONE
                 }
             }
 
+            // Handles response from update folder request
             override fun onResponse(call: Call, response: Response) {
+
+                // Takes page out of processing state
                 runOnUiThread {
+                    deleteButton.isEnabled = true
                     btnCreate.isEnabled = true
                     progressBar.visibility = View.GONE
                 }
@@ -182,6 +196,7 @@ class FolderActivity:BaseActivity() {
                         finish()
                     }
                 } else if (response.code == 401) {
+                    // Logouts user and navigates them home if response code is 401
                     runOnUiThread {
                         Toast.makeText(this@FolderActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                         AuthManager.logout(this@FolderActivity)
@@ -196,9 +211,19 @@ class FolderActivity:BaseActivity() {
         })
     }
 
+    // Sends request to backend to delete the folder with the given id
     private fun deleteFolder(id: String) {
         val authToken = AuthManager.getToken(this)
         val baseUrl = BuildConfig.BASE_URL
+
+        val btnCreate = findViewById<Button>(R.id.button4)
+        val deleteButton = findViewById<Button>(R.id.button5)
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+
+        // Sets page into processing state
+        btnCreate.isEnabled = false
+        deleteButton.isEnabled = false
+        progressBar.visibility = View.VISIBLE
 
 
         val client = OkHttpClient()
@@ -209,9 +234,17 @@ class FolderActivity:BaseActivity() {
             .build()
 
         CoroutineScope(Dispatchers.IO).launch {
+            // Takes page out of processing state
+            withContext(Dispatchers.Main) {
+                deleteButton.isEnabled = true
+                btnCreate.isEnabled = true
+                progressBar.visibility = View.GONE
+            }
+
             try {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
+                    // Sends user home after if folder deletion is successful
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@FolderActivity, "Folder Deleted", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@FolderActivity, PasswordListActivity::class.java)
@@ -219,10 +252,9 @@ class FolderActivity:BaseActivity() {
 
                         finish()
                     }
-
-
                 } else {
                     if (response.code == 401) {
+                        // Logs user out and navigates them home if response code is 401
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@FolderActivity, "Session Expired", Toast.LENGTH_SHORT).show()
                             AuthManager.logout(this@FolderActivity)

@@ -28,18 +28,22 @@ object AuthManager {
     @Volatile
     private var validationJob: Deferred<Boolean>? = null
 
+    // Saves access token to android secure store
     fun saveToken(context: Context, token: String) {
         getPrefs(context).edit() { putString(KEY_TOKEN, token) }
     }
 
+    // Gets token from storage
     fun getToken(context: Context): String? {
         return getPrefs(context).getString(KEY_TOKEN, null)
     }
 
+    // Checks if a token is present in storage
     fun isLoggedIn(context: Context): Boolean {
         return getToken(context) != null
     }
 
+    // Deletes access token and encryption key from storage logging out user and navigating them to home page
     fun logout(context: Context) {
         getPrefs(context).edit() { remove(KEY_TOKEN) }
         EncryptionManager.deleteStoredKey(context)
@@ -54,6 +58,7 @@ object AuthManager {
         }
     }
 
+    // Creates entry in android secure storage
     private fun getPrefs(context: Context): SharedPreferences {
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -67,8 +72,10 @@ object AuthManager {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
     }
-    suspend fun validateToken(context: Context): Boolean {
 
+    // Sends request to backend to validate access token
+    // Ensures only 1 validation request is sent at a time
+    suspend fun validateToken(context: Context): Boolean {
 
         validationJob?.let {
             return it.await()

@@ -44,6 +44,7 @@ class LoginActivity: BaseActivity() {
         }
 
 
+        // Checks visibility of password and changes visibility icon on touch
         editTextPassword.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = 2
@@ -75,6 +76,8 @@ class LoginActivity: BaseActivity() {
 
     }
 
+    // On Resume auth status is checked
+    // If user is logged in they are navigated to the passwordList page
     override fun onResume() {
         super.onResume()
 
@@ -90,30 +93,32 @@ class LoginActivity: BaseActivity() {
         }
     }
 
+    // Navigates user to passwordList page
     private fun navigateToPasswordList() {
         val intent = Intent(this, PasswordListActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+
     private fun performLogin() {
         val username = findViewById<EditText>(R.id.editTextUsername).text.toString().lowercase()
         val password = findViewById<EditText>(R.id.editTextPassword).text.toString()
 
-        // TODO: Validate input here
-
         // Make network request
         sendLoginRequest(username, password)
     }
+
+    // Sends a login request to the backend API
     private fun sendLoginRequest(username: String, password: String) {
         val btnSignIn = findViewById<Button>(R.id.button)
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
+        // Sets page into processing state
         btnSignIn.isEnabled = false
         progressBar.visibility = View.VISIBLE
 
         val baseUrl = BuildConfig.BASE_URL
-
         val client = OkHttpClient()
 
         val formBody = FormBody.Builder()
@@ -133,8 +138,15 @@ class LoginActivity: BaseActivity() {
                 }
             }
 
+            // Handles response from login request
             override fun onResponse(call: Call, response: Response) {
+                runOnUiThread{
+                    btnSignIn.isEnabled = true
+                    progressBar.visibility = View.GONE
+                }
 
+                // If successful access token and encryption are stored
+                // and user is navigated to passwordList page
                 if (response.isSuccessful) {
                     val body = response.body?.string()
                     if (body != null) {
@@ -143,9 +155,11 @@ class LoginActivity: BaseActivity() {
                             val token = json.getString("access")
                             val encryptSalt = json.getString("encryption_salt")
 
+                            // Saves Token and updates login status
                             AuthManager.saveToken(this@LoginActivity, token)
                             AuthManager.isLogged = true
 
+                            // Creates and stores encryption key
                             CoroutineScope(Dispatchers.IO).launch {
                                 val key = EncryptionManager.deriveKey(
                                     password,
@@ -154,6 +168,7 @@ class LoginActivity: BaseActivity() {
                                 EncryptionManager.storeDerivedKey(this@LoginActivity, key)
                             }
 
+                            // Outputs success message and navigates user to passwordList page
                             runOnUiThread {
                                 Toast.makeText(
                                     this@LoginActivity,
@@ -166,8 +181,6 @@ class LoginActivity: BaseActivity() {
                                 startActivity(intent)
                                 finish()
 
-                                btnSignIn.isEnabled = true
-                                progressBar.visibility = View.GONE
                             }
 
                         } catch (e: JSONException) {
@@ -178,15 +191,12 @@ class LoginActivity: BaseActivity() {
                                     "Response parsing error",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                btnSignIn.isEnabled = true
-                                progressBar.visibility = View.GONE
                             }
                         }
                     }
                 } else {
+                    // Displays account locked and lock until time
                     val errorBody = response.body?.string()
-
-
                     if (response.code == 403 && errorBody != null) {
                         try {
                             val json = JSONObject(errorBody)
@@ -230,16 +240,12 @@ class LoginActivity: BaseActivity() {
                         }
                     }
 
-                    runOnUiThread{
-                        btnSignIn.isEnabled = true
-                        progressBar.visibility = View.GONE
-                    }
-
                 }
             }
         })
     }
 
+    // Convert Utc time from backend to local time
     fun formatUtcToLocal(utcTimeString: String): String {
         return try {
             // Clean input as before
