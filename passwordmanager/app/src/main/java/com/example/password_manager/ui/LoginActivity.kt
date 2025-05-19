@@ -199,28 +199,16 @@ class LoginActivity: BaseActivity() {
                     val errorBody = response.body?.string()
                     if (response.code == 403 && errorBody != null) {
                         try {
-                            val json = JSONObject(errorBody)
-                            if (json.has("time")) {
-                                val lockTimeUtc = json.getString("time")
-                                Log.d("loginTime", lockTimeUtc)
-                                val formattedTime = formatUtcToLocal(lockTimeUtc + "Z")
-                                Log.d("loginFormatted", formattedTime)
+
+                            val message = errorBody.trim().removeSurrounding("\"")
                                 runOnUiThread {
                                 Toast.makeText(
                                     this@LoginActivity,
-                                    "Account locked until: $formattedTime",
+                                    message,
                                     Toast.LENGTH_LONG
                                 ).show()
                                 }
-                            } else {
-                                runOnUiThread {
-                                    Toast.makeText(
-                                        this@LoginActivity,
-                                        "Access forbidden.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
+
                         } catch (e: JSONException) {
                             runOnUiThread {
                                 Toast.makeText(
@@ -243,30 +231,6 @@ class LoginActivity: BaseActivity() {
                 }
             }
         })
-    }
-
-    // Convert Utc time from backend to local time
-    fun formatUtcToLocal(utcTimeString: String): String {
-        return try {
-            // Clean input as before
-            val cleaned = if (utcTimeString.matches(Regex(".*\\+\\d{2}:\\d{2}Z$"))) {
-                utcTimeString.dropLast(1)
-            } else {
-                utcTimeString
-            }
-            val noFraction = cleaned.replace(Regex("\\.\\d+"), "")
-
-            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
-            sdf.timeZone = TimeZone.getTimeZone("UTC")
-            val date = sdf.parse(noFraction)
-
-            // 12-hour format with AM/PM = "hh:mm:ss a"
-            val outputSdf = SimpleDateFormat("yyyy-MM-dd hh:mm:ss a z", Locale.getDefault())
-            outputSdf.timeZone = TimeZone.getDefault()
-            outputSdf.format(date!!)
-        } catch (e: Exception) {
-            utcTimeString
-        }
     }
 
 }

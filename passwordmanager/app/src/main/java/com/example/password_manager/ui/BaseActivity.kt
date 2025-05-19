@@ -1,5 +1,6 @@
 package com.example.password_manager.ui
 
+
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
@@ -30,6 +31,7 @@ abstract class BaseActivity : AppCompatActivity() {
             setLogoutVisibility()
         }
     }
+
     // Ensures login status is stored in the isLogged variable before updating top bar
     private suspend fun setLogoutVisibility() {
         if (AuthManager.isLogged == null) {

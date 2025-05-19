@@ -13,7 +13,7 @@ import com.example.password_manager.utils.AuthManager
 import kotlinx.coroutines.launch
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
 
