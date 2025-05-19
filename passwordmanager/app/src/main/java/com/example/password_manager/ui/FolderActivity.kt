@@ -64,28 +64,6 @@ class FolderActivity:BaseActivity() {
 
     }
 
-    // Checks user auth status on resume and logouts as well as navigates them home
-    override fun onResume() {
-        super.onResume()
-
-        lifecycleScope.launch {
-            if (AuthManager.isLogged == null) {
-                val valid = AuthManager.validateToken(this@FolderActivity)
-                if (!valid) {
-                    navigateToHome()
-                }
-            } else if (AuthManager.isLogged != true) {
-                navigateToHome()
-            }
-        }
-    }
-
-    // Navigates the user to the home page
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
 
     // Sends Request to the backend fetch folder using id
     private fun fetchFolderFromBackend(id: String) {
@@ -120,8 +98,9 @@ class FolderActivity:BaseActivity() {
                     if (response.code == 401) {
                         // Logs out user and navigates home if code is 401
                         withContext(Dispatchers.Main) {
-                            AuthManager.logout(this@FolderActivity)
-                            Toast.makeText(this@FolderActivity, "Session Expired", Toast.LENGTH_SHORT).show()
+
+                            AuthManager.logout(this@FolderActivity, true)
+
                         }
                     }
 
@@ -207,8 +186,8 @@ class FolderActivity:BaseActivity() {
                 } else if (response.code == 401) {
                     // Logouts user and navigates them home if response code is 401
                     runOnUiThread {
-                        Toast.makeText(this@FolderActivity, "Session Expired", Toast.LENGTH_SHORT).show()
-                        AuthManager.logout(this@FolderActivity)
+
+                        AuthManager.logout(this@FolderActivity, true)
                     }
                 } else {
                     val errorBody = response.body?.string()
@@ -265,8 +244,7 @@ class FolderActivity:BaseActivity() {
                     if (response.code == 401) {
                         // Logs user out and navigates them home if response code is 401
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@FolderActivity, "Session Expired", Toast.LENGTH_SHORT).show()
-                            AuthManager.logout(this@FolderActivity)
+                            AuthManager.logout(this@FolderActivity, true)
                         }
                     }
 

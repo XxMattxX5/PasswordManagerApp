@@ -4,10 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.password_manager.ui.HomeActivity
 import androidx.core.content.edit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -44,17 +47,29 @@ object AuthManager {
     }
 
     // Deletes access token and encryption key from storage logging out user and navigating them to home page
-    fun logout(context: Context) {
+    fun logout(context: Context, wasLoggedOutDueToExpiration: Boolean = false) {
+
         getPrefs(context).edit() { remove(KEY_TOKEN) }
         EncryptionManager.deleteStoredKey(context)
         isLogged = false
 
-        val intent = Intent(context, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        context.startActivity(intent)
 
-        if (context is Activity) {
-            context.finish()
+
+        val isAppInForeground = ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(
+            Lifecycle.State.STARTED)
+
+        if (isAppInForeground) {
+            if (wasLoggedOutDueToExpiration == true) {
+                Toast.makeText(context, "Session Expired", Toast.LENGTH_SHORT).show()
+            }
+
+            val intent = Intent(context, HomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            context.startActivity(intent)
+
+            if (context is Activity) {
+                context.finish()
+            }
         }
     }
 

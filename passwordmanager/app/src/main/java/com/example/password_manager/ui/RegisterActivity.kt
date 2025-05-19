@@ -31,8 +31,7 @@ import kotlinx.coroutines.launch
 
 
 class RegisterActivity: BaseActivity() {
-
-
+    override fun shouldEnforceAuth(): Boolean = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -10,6 +10,9 @@ import kotlinx.coroutines.launch
 
 
 class HomeActivity: BaseActivity() {
+
+    override fun shouldEnforceAuth(): Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)

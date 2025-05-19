@@ -107,30 +107,6 @@ class PasswordActivity: BaseActivity() {
 
     }
 
-    // On resume the user's auth status is checked
-    // If the user is no longer logged in the user is navigated home
-    override fun onResume() {
-        super.onResume()
-
-        lifecycleScope.launch {
-            if (AuthManager.isLogged == null) {
-                val valid = AuthManager.validateToken(this@PasswordActivity)
-                if (!valid) {
-                    navigateToHome()
-                }
-            } else if (AuthManager.isLogged != true) {
-                navigateToHome()
-            }
-        }
-    }
-
-    // Navigates the user home
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
     // Fetches password data from the backend api given the password id
     private fun fetchPasswordFromBackend(id: String) {
         val authToken = AuthManager.getToken(this)
@@ -180,8 +156,8 @@ class PasswordActivity: BaseActivity() {
                     if (response.code == 401) {
                         // If response returns 401 user is logged out and navigated hom
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@PasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
-                            AuthManager.logout(this@PasswordActivity)
+
+                            AuthManager.logout(this@PasswordActivity, true)
                         }
                     }
 
@@ -240,6 +216,7 @@ class PasswordActivity: BaseActivity() {
         val encryptedPassword: String = if (encryptionKey != null) {
             EncryptionManager.encryptPassword(password, encryptionKey)
         } else {
+
             AuthManager.logout(this)
             Toast.makeText(this@PasswordActivity, "Error occurred during password encryption", Toast.LENGTH_SHORT).show()
             return
@@ -289,8 +266,8 @@ class PasswordActivity: BaseActivity() {
                 } else if (response.code == 401) {
                     // If the response is 401 user is logged out and navigated home
                     runOnUiThread {
-                        Toast.makeText(this@PasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
-                        AuthManager.logout(this@PasswordActivity)
+
+                        AuthManager.logout(this@PasswordActivity, true)
                     }
                 } else {
                     val errorBody = response.body?.string()
@@ -346,8 +323,8 @@ class PasswordActivity: BaseActivity() {
                     if (response.code == 401) {
                         // if response is 401 user is logged out and navigated hom
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@PasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
-                            AuthManager.logout(this@PasswordActivity)
+
+                            AuthManager.logout(this@PasswordActivity, true)
                         }
                     }
 

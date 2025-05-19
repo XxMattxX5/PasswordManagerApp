@@ -1,11 +1,12 @@
 package com.example.password_manager.ui
 
+import android.content.Intent
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.password_manager.R
 import com.example.password_manager.utils.AuthManager
@@ -18,6 +19,8 @@ import androidx.core.view.updatePadding
 
 
 abstract class BaseActivity : AppCompatActivity() {
+
+    protected open fun shouldEnforceAuth(): Boolean = true
 
     override fun setContentView(layoutResID: Int) {
         // Inflate a base layout with a top bar
@@ -63,6 +66,31 @@ abstract class BaseActivity : AppCompatActivity() {
             insets
         }
         
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Only act if this screen requires login
+        if (!shouldEnforceAuth()) return
+
+        // If already logged out (from periodic check), redirect now
+        if (AuthManager.isLogged == false) {
+            navigateToHome()
+        } else if (AuthManager.isLogged == null) {
+            lifecycleScope.launch {
+                val valid = AuthManager.validateToken(this@BaseActivity)
+                if (!valid) {
+                    navigateToHome()
+                }
+            }
+        }
+    }
+
+    private fun navigateToHome() {
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     // Ensures login status is stored in the isLogged variable before updating top bar

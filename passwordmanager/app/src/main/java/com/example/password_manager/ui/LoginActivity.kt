@@ -29,6 +29,9 @@ import java.util.TimeZone
 
 
 class LoginActivity: BaseActivity() {
+
+    override fun shouldEnforceAuth(): Boolean = false
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -201,13 +204,13 @@ class LoginActivity: BaseActivity() {
                         try {
 
                             val message = errorBody.trim().removeSurrounding("\"")
-                                runOnUiThread {
+                            runOnUiThread {
                                 Toast.makeText(
                                     this@LoginActivity,
                                     message,
                                     Toast.LENGTH_LONG
                                 ).show()
-                                }
+                            }
 
                         } catch (e: JSONException) {
                             runOnUiThread {

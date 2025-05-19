@@ -35,29 +35,6 @@ class CreateFolderActivity:BaseActivity() {
 
     }
 
-    // Checks login status on resume and redirects if auth changed
-    override fun onResume() {
-        super.onResume()
-
-        lifecycleScope.launch {
-            if (AuthManager.isLogged == null) {
-                val valid = AuthManager.validateToken(this@CreateFolderActivity)
-                if (!valid) {
-                    navigateToHome()
-                }
-            } else if (AuthManager.isLogged != true) {
-                navigateToHome()
-            }
-        }
-    }
-
-    // Navigates user to the home page
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
     // Sends Request to backend API to create a new folder
     private fun createFolder(folderName: String) {
         val btnCreate = findViewById<Button>(R.id.button4)
@@ -116,8 +93,8 @@ class CreateFolderActivity:BaseActivity() {
 
                     } else if (response.code == 401) {
                         // Logs user out and navigates home if code is 401
-                        AuthManager.logout(this@CreateFolderActivity)
-                        Toast.makeText(applicationContext, "Session Expired", Toast.LENGTH_SHORT).show()
+                        AuthManager.logout(this@CreateFolderActivity,true)
+
                     } else {
                         Toast.makeText(
                             applicationContext,

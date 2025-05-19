@@ -95,28 +95,6 @@ class CreatePasswordActivity: BaseActivity() {
 
     }
 
-    // Checks auth on resume and navigates user home on auth change
-    override fun onResume() {
-        super.onResume()
-
-        lifecycleScope.launch {
-            if (AuthManager.isLogged == null) {
-                val valid = AuthManager.validateToken(this@CreatePasswordActivity)
-                if (!valid) {
-                    navigateToHome()
-                }
-            } else if (AuthManager.isLogged != true) {
-                navigateToHome()
-            }
-        }
-    }
-
-    // Navigates to the home page
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
 
     // Sends a request to backend API to create a new password associated with the user
     private fun sendCreatePasswordRequest(
@@ -188,7 +166,6 @@ class CreatePasswordActivity: BaseActivity() {
                 if (response.isSuccessful) {
                     runOnUiThread {
                         Toast.makeText(this@CreatePasswordActivity, "Password created successfully!", Toast.LENGTH_SHORT).show()
-
                         val intent = Intent(this@CreatePasswordActivity, PasswordListActivity::class.java)
                         startActivity(intent)
 
@@ -197,8 +174,8 @@ class CreatePasswordActivity: BaseActivity() {
                 } else if (response.code == 401) {
                     // Logs user out and navigates home if code is 401
                     runOnUiThread {
-                        Toast.makeText(this@CreatePasswordActivity, "Session Expired", Toast.LENGTH_SHORT).show()
-                        AuthManager.logout(this@CreatePasswordActivity)
+
+                        AuthManager.logout(this@CreatePasswordActivity, true)
                     }
                 } else {
                     val errorBody = response.body?.string()

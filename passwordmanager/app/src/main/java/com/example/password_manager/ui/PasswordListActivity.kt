@@ -111,30 +111,6 @@ class PasswordListActivity : BaseActivity() {
         })
     }
 
-    // On resume user's auth is checked
-    // If user is no longer logged in they are navigated hom
-    override fun onResume() {
-        super.onResume()
-
-        lifecycleScope.launch {
-            if (AuthManager.isLogged == null) {
-                val valid = AuthManager.validateToken(this@PasswordListActivity)
-                if (!valid) {
-                    navigateToHome()
-                }
-            } else if (AuthManager.isLogged != true) {
-                navigateToHome()
-            }
-        }
-    }
-
-    // Navigates user to home page
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
     // Sends request to backend to fetch a list of passwords and folders associated with user
     private fun fetchPasswordsFromBackend(query: String = "") {
         val authToken = AuthManager.getToken(this)
@@ -172,8 +148,7 @@ class PasswordListActivity : BaseActivity() {
                     if (response.code == 401) {
                         // If response is 401 user is logged out and navigated home
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@PasswordListActivity, "Session Expired", Toast.LENGTH_SHORT).show()
-                            AuthManager.logout(this@PasswordListActivity)
+                            AuthManager.logout(this@PasswordListActivity, true)
                         }
                     }
 
