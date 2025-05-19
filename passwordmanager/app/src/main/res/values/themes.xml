@@ -4,7 +4,7 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
         <item name="colorPrimary">@color/darkGreen</item>
-        <item name="android:statusBarColor">@color/darkGreen</item>
+
     </style>
     <style name="CustomButton" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/darkGreen</item>

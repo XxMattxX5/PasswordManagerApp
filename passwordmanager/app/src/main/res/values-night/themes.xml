@@ -4,6 +4,8 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
         <item name="colorPrimary">@color/darkGreen</item>
+
+
     </style>
     <style name="CustomButton2" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@android:color/transparent</item>
